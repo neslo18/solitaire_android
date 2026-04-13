@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://ddli5ehe8bewb"]
+
+[ext_resource type="Texture2D" uid="uid://dq6vuoocaa10b" path="res://fotos/Full_Deck.png" id="1_6g18p"]
+[ext_resource type="Script" uid="uid://cq4c0yleky8pm" path="res://CardObject.cs" id="2_q1hb7"]
+
+[node name="CardObject" type="Sprite2D" unique_id=1357641197]
+scale = Vector2(1.25, 1.25)
+texture = ExtResource("1_6g18p")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 71, 96)
+script = ExtResource("2_q1hb7")

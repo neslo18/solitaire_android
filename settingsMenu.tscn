@@ -1,0 +1,151 @@
+[gd_scene format=3 uid="uid://cg2nft4kcbt8k"]
+
+[ext_resource type="Script" uid="uid://dnj0gft3ojal" path="res://SettingsMenu.cs" id="1_3t2o7"]
+[ext_resource type="Texture2D" uid="uid://dvnij1v2ud0q7" path="res://fotos/Tardis.png" id="2_pqu7y"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_h1lfp"]
+font_size = 24
+
+[node name="settingsMenu" type="Control" unique_id=132215730]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 243.0
+offset_right = 2.0
+offset_bottom = -545.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3t2o7")
+
+[node name="Panel" type="Panel" parent="." unique_id=1392689795]
+self_modulate = Color(0.012617188, 0.012617188, 0.012617188, 1)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.49600002
+anchor_right = 0.5
+anchor_bottom = 0.49600002
+offset_left = -333.0
+offset_top = -266.69202
+offset_right = 329.0
+offset_bottom = 267.30798
+
+[node name="OptionsLabel" type="Label" parent="Panel" unique_id=1579750141]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 13.0
+offset_right = 648.0
+offset_bottom = 106.0
+theme_override_font_sizes/font_size = 16
+text = "Options"
+label_settings = SubResource("LabelSettings_h1lfp")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DrawModeLabel" type="Label" parent="Panel" unique_id=1939111290]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 104.29999
+offset_right = 275.0
+offset_bottom = 163.29999
+text = "Draw Mode:"
+label_settings = SubResource("LabelSettings_h1lfp")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DrawMode" type="Label" parent="Panel" unique_id=1565796637]
+layout_mode = 0
+offset_left = 221.0
+offset_top = 106.29999
+offset_right = 424.0
+offset_bottom = 165.29999
+text = "3 Cards"
+label_settings = SubResource("LabelSettings_h1lfp")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ToggleDrawModeButton" type="Button" parent="Panel" unique_id=1649441572]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 110.29999
+offset_right = 540.0
+offset_bottom = 165.29999
+theme_override_font_sizes/font_size = 24
+text = "Toggle"
+
+[node name="BoardColorLabel" type="Label" parent="Panel" unique_id=1457401166]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 191.0
+offset_right = 275.0
+offset_bottom = 250.0
+text = "Board Color:"
+label_settings = SubResource("LabelSettings_h1lfp")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BoardColor" type="ColorPickerButton" parent="Panel" unique_id=406102653]
+layout_mode = 0
+offset_left = 282.0
+offset_top = 190.0
+offset_right = 370.25
+offset_bottom = 250.0
+color = Color(0.21568628, 0.53333336, 0.22352941, 1)
+
+[node name="ResetColorButton" type="Button" parent="Panel" unique_id=1556295191]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 191.0
+offset_right = 540.0
+offset_bottom = 251.0
+theme_override_font_sizes/font_size = 24
+text = "Reset"
+
+[node name="CardTemplateLabel" type="Label" parent="Panel" unique_id=168451801]
+layout_mode = 0
+offset_left = 54.0
+offset_top = 271.3
+offset_right = 257.0
+offset_bottom = 330.3
+text = "Card Template:"
+label_settings = SubResource("LabelSettings_h1lfp")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CardTemplate" type="TextureRect" parent="Panel" unique_id=2042402531]
+layout_mode = 0
+offset_left = 282.00006
+offset_top = 273.3
+offset_right = 353.00006
+offset_bottom = 369.3
+scale = Vector2(1.25, 1.25)
+texture = ExtResource("2_pqu7y")
+
+[node name="ImportTemplateButton" type="Button" parent="Panel" unique_id=2011107436]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 275.0
+offset_right = 537.0
+offset_bottom = 400.3
+theme_override_font_sizes/font_size = 24
+text = "Import"
+
+[node name="ResetTemplateButton" type="Button" parent="Panel" unique_id=817359588]
+layout_mode = 0
+offset_left = 543.0
+offset_top = 275.0
+offset_right = 634.0
+offset_bottom = 398.3
+theme_override_font_sizes/font_size = 24
+text = "Reset"
+
+[node name="CloseButton" type="Button" parent="Panel" unique_id=1535573787]
+layout_mode = 0
+offset_left = 264.0
+offset_top = 448.0
+offset_right = 404.0
+offset_bottom = 509.0
+theme_override_font_sizes/font_size = 24
+text = "Close"

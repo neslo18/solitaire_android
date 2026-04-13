@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://bni86f76fefn0"]
+
+[ext_resource type="Texture2D" uid="uid://d0m4weoj7smij" path="res://fotos/subMenu.png" id="1_5m0rv"]
+[ext_resource type="Texture2D" uid="uid://sy8jsekvts1a" path="res://fotos/new_game.png" id="2_yquxw"]
+[ext_resource type="Texture2D" uid="uid://btanbw7tj2j06" path="res://fotos/hint.png" id="3_0d2jk"]
+[ext_resource type="Texture2D" uid="uid://blw34q8d152dm" path="res://fotos/undo.png" id="4_b3chf"]
+[ext_resource type="Texture2D" uid="uid://c2cv3jc46yrni" path="res://fotos/settings.png" id="5_ka41t"]
+
+[node name="subMenu" type="Control" unique_id=1110517185]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -1340.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1115223566]
+layout_mode = 0
+offset_left = 20.0
+offset_right = 700.0
+offset_bottom = 100.0
+texture = ExtResource("1_5m0rv")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TextureRect" unique_id=508650756]
+layout_mode = 0
+offset_left = 60.0
+offset_right = 660.0
+offset_bottom = 100.0
+theme_override_constants/separation = 100
+
+[node name="newGameButton" type="TextureButton" parent="TextureRect/HBoxContainer" unique_id=1719067664]
+layout_mode = 2
+texture_normal = ExtResource("2_yquxw")
+stretch_mode = 5
+
+[node name="hintButton" type="TextureButton" parent="TextureRect/HBoxContainer" unique_id=1160244186]
+layout_mode = 2
+texture_normal = ExtResource("3_0d2jk")
+stretch_mode = 5
+
+[node name="undoButton" type="TextureButton" parent="TextureRect/HBoxContainer" unique_id=68620347]
+layout_mode = 2
+texture_normal = ExtResource("4_b3chf")
+stretch_mode = 5
+
+[node name="settingsButton" type="TextureButton" parent="TextureRect/HBoxContainer" unique_id=1738583431]
+layout_mode = 2
+texture_normal = ExtResource("5_ka41t")
+stretch_mode = 5

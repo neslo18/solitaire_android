@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://cdk1ku0tj3lej"]
+
+[ext_resource type="Script" uid="uid://b72uaqofcouau" path="res://NewGameMessage.cs" id="1_2ugce"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_h1lfp"]
+font_size = 24
+
+[node name="newGameMessage" type="Control" unique_id=132215730]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 376.0
+offset_bottom = -552.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2ugce")
+
+[node name="Panel" type="Panel" parent="." unique_id=1392689795]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.51100004
+anchor_top = 0.5
+anchor_right = 0.51100004
+anchor_bottom = 0.51000005
+offset_left = -330.92
+offset_top = -157.0
+offset_right = 331.08
+offset_bottom = 161.87997
+
+[node name="Label" type="Label" parent="Panel" unique_id=1579750141]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 29.0
+offset_right = 645.0
+offset_bottom = 122.0
+text = "Start a new Game? "
+label_settings = SubResource("LabelSettings_h1lfp")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="yesButton" type="Button" parent="Panel" unique_id=1535573787]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 182.0
+offset_right = 225.0
+offset_bottom = 262.0
+theme_override_font_sizes/font_size = 24
+text = "Yes"
+
+[node name="noButton" type="Button" parent="Panel" unique_id=1663862985]
+layout_mode = 0
+offset_left = 403.0
+offset_top = 182.0
+offset_right = 543.0
+offset_bottom = 262.0
+theme_override_font_sizes/font_size = 24
+text = "No"
