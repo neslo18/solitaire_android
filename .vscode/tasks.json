@@ -3,16 +3,15 @@
     "tasks": [
         {
             "label": "build",
-            "command": "C:\\Users\\Neslo\\Downloads\\Godot\\Godot_v3.5.1-stable_mono_win64\\Godot_v3.5.1-stable_mono_win64.exe",
+            "command": "dotnet",
             "type": "process",
             "args": [
-                "--build-solutions",
-                "--path",
-                "${workspaceRoot}",
-                "--no-window",
-                "-q"
+                "build"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
         }
     ]
 }

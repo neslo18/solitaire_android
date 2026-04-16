@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 public partial class GameBoard : Node2D
 {
+	private bool gameLoading = true;
 	private PackedScene _newGameDialog = GD.Load<PackedScene>("res://newGameMessage.tscn");
 	private PackedScene _settingsDialog = GD.Load<PackedScene>("res://settingsMenu.tscn");
 	private readonly static Texture emptyDeckImg = (Texture) GD.Load("res://fotos/Empty_Deck.png");
@@ -18,15 +19,19 @@ public partial class GameBoard : Node2D
 	private readonly CustomList deck = new([], "deck"), drawnDeck = new([], "drawnDeck");
 	private readonly CustomList[] tabluea = new CustomList[7];
 	private readonly CustomList[] foundations = new CustomList[4];
-    private readonly TextureRect[] tableauSlots = new TextureRect[7];
-    private readonly TextureRect[] foundationSlots = new TextureRect[4];
-    private TextureButton deckSlot;
+	private readonly TextureRect[] tableauSlots = new TextureRect[7];
+	private readonly TextureRect[] foundationSlots = new TextureRect[4];
+	private TextureButton deckSlot;
 	private bool pauseTree = true;
 
 	// occurs when screen redraws
-    public override void _Process(double delta)
-    {
-        timeElapsed += delta;
+	public override void _Process(double delta)
+	{
+		if (gameLoading)
+		{
+			return;
+		}
+		timeElapsed += delta;
 
 		// updates time on clock
 		if (timeElapsed >= 1.0)
@@ -46,7 +51,7 @@ public partial class GameBoard : Node2D
 				timeLabel.Text = formatted;
 			}
 		}
-    }
+	}
 
 	// occurs when node enters the scene
 	public override async void _Ready()
@@ -138,6 +143,7 @@ public partial class GameBoard : Node2D
 			for (int j = 1; j < 14; j++)
 			{
 				var newCard = cardObj.Instantiate<CardObject>();
+				newCard.Position = deckSlot.Position;
 				AllCards.Add(newCard.Init(i, j));
 				newCard.ScoreChange += UpdateScore; 
 				newCard.CardMoved += CardMoved;
@@ -161,12 +167,14 @@ public partial class GameBoard : Node2D
 			for (int j = 0; j < (i + 1); j++)
 			{
 				int randomNum = random.Next(0, AllCards.Count);
-				AllCards[randomNum].GlobalPosition = new Vector2(tableauSlots[i].GlobalPosition.X, tableauSlots[i].GlobalPosition.Y + (j * offset));
 				AllCards[randomNum].MoveToFront();
+				//AllCards[randomNum].GlobalPosition = new Vector2(tableauSlots[i].GlobalPosition.X, tableauSlots[i].GlobalPosition.Y + (j * offset));
+				AllCards[randomNum].SnapNewPos(new Vector2(tableauSlots[i].GlobalPosition.X, tableauSlots[i].GlobalPosition.Y + (j * offset)));
+				await Task.Delay(100);
 				AllCards[randomNum].ChangeList(tabluea[i]);
 				AllCards.RemoveAt(randomNum);
 			}
-			tabluea[i].list[^1].FlipCard();
+			tabluea[i].list[^1].FlipCard(true);
 			tabluea[i].list[^1].SetMovable(true);
 		}
 
@@ -199,6 +207,12 @@ public partial class GameBoard : Node2D
 		Moves.Add(newMove);
 		TableMove.Add(new Table(deck, drawnDeck, tabluea, foundations, deckSlot.TextureNormal));
 		scoreMoves.Add(0);
+
+		foreach (CardObject card in everyCard)
+		{
+			card.setGameLoaded();
+		}
+		gameLoading = false;
 	}
 
 	// determines if won
@@ -237,6 +251,11 @@ public partial class GameBoard : Node2D
 	// attempts to draw new card from deck, or flip deck over
 	private void DeckDraw()
 	{
+
+		if (gameLoading)
+		{
+			return;
+		}
 		// reset drawn into deck if reached 0
 		// or align cards in order being newly drawn cards
 		foreach (CardObject card in drawnDeck.list)
@@ -306,7 +325,7 @@ public partial class GameBoard : Node2D
 	}
 
 	// auto move logic. Double click card moves to first available slot if found
-	private void AutoMove(CardObject movedCard)
+	private async void AutoMove(CardObject movedCard)
 	{
 		// tests if foundation is applicable
 		CustomList FoundationSlot = TestFoundation(movedCard);
@@ -324,7 +343,6 @@ public partial class GameBoard : Node2D
 						if (foundations[ii].list.Contains(movedCard))
 						{
 							skipScore = true;
-							break;
 						}
 					}
 					if (!skipScore)
@@ -332,6 +350,7 @@ public partial class GameBoard : Node2D
 						UpdateScore(10);
 					}
 					movedCard.SnapNewPos(foundationSlots[i].GlobalPosition);
+					await Task.Delay(300);
 					movedCard.GetTopCard()?.SetBottomCard(null);
 					movedCard.SetTopCard(null);
 					movedCard.ChangeList(FoundationSlot);
@@ -340,7 +359,7 @@ public partial class GameBoard : Node2D
 					{
 						ShowFireworks();
 					}
-					break;
+					return;
 				}
 			}
 		}
@@ -365,7 +384,6 @@ public partial class GameBoard : Node2D
 								{
 									skipScore = true;
 									UpdateScore(-10);
-									break;
 								}
 							}
 							if (!drawnDeck.list.Contains(movedCard))
@@ -378,11 +396,12 @@ public partial class GameBoard : Node2D
 								UpdateScore(5);
 							}
 							movedCard.SnapNewPos(tableauSlots[i].GlobalPosition);
+							await Task.Delay(300);
 							movedCard.GetTopCard()?.SetBottomCard(null);
 							movedCard.SetTopCard(null);
 							movedCard.ChangeList(TableauSlot);
 							UpdateMoves();
-							break;
+							return;
 						}
 					}
 				}
@@ -408,11 +427,13 @@ public partial class GameBoard : Node2D
 					}
 					Vector2 newPos = new(TableauSlot.list[^1].Position.X, TableauSlot.list[^1].Position.Y + 25);
 					movedCard.SnapNewPos(newPos);
+					await Task.Delay(300);
 					TableauSlot.list[^1].SetBottomCard(movedCard);
 					movedCard.GetTopCard()?.SetBottomCard(null);
 					movedCard.SetTopCard(TableauSlot.list[^1]);
 					movedCard.ChangeList(TableauSlot);
 					UpdateMoves();
+					return;
 				}
 			}
 		}
@@ -644,6 +665,10 @@ public partial class GameBoard : Node2D
 	// triggers when hint button is pressed.
 	private void Hint()
 	{
+		if (gameLoading)
+		{
+			return;
+		}
 		if (drawnDeck.list.Count > 0)
 		{
 			if (HintMove(drawnDeck.list[^1], true))
@@ -727,6 +752,11 @@ public partial class GameBoard : Node2D
 	// triggers when new game button is pressed; opens new game dialog
 	private void NewGame()
 	{
+		if (gameLoading)
+		{
+			return;
+		}
+
 		var dialog = _newGameDialog.Instantiate<NewGameMessage>();
 
 		AddChild(dialog);
@@ -758,6 +788,11 @@ public partial class GameBoard : Node2D
 	// Undos last move
 	private void Undo()
 	{
+		if (gameLoading)
+		{
+			return;
+		}
+
 		if (Moves.Count > 1)
 		{
 			// updates all cards to old positions and variable data
@@ -812,14 +847,14 @@ public partial class GameBoard : Node2D
 
 			//reset all list arrays to undo last action
 			for (int i = 0; i < tabluea.Length; i++)
-        	{
-        	    tabluea[i].list = [..TableMove[^2].GetTableauAt(i).list];
-        	}
+			{
+				tabluea[i].list = [..TableMove[^2].GetTableauAt(i).list];
+			}
 
 			for (int i = 0; i < foundations.Length; i++)
-        	{
-        	    foundations[i].list = [..TableMove[^2].GetFoundationuAt(i).list];
-        	}
+			{
+				foundations[i].list = [..TableMove[^2].GetFoundationuAt(i).list];
+			}
 
 			deck.list = [..TableMove[^2].GetDeck().list];
 			drawnDeck.list = [..TableMove[^2].GetDrawnDeck().list];
@@ -865,6 +900,11 @@ public partial class GameBoard : Node2D
 	// triggers when Settings button is pressed; opens settings window
 	private void OpenSettings()
 	{
+		if (gameLoading)
+		{
+			return;
+		}
+
 		var dialog = _settingsDialog.Instantiate<SettingsMenu>();
 
 		AddChild(dialog);
@@ -899,9 +939,9 @@ public partial class GameBoard : Node2D
 		byte[] imgData = img.SavePngToBuffer(); 
 
 		var data = new Godot.Collections.Dictionary
-        {
-            ["texture_buffer"] = imgData
-        };
+		{
+			["texture_buffer"] = imgData
+		};
 
 		using var templateFile = FileAccess.Open("user://solitaireTemplate.save", FileAccess.ModeFlags.Write);
 		templateFile.StoreVar(data);

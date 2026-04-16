@@ -5,15 +5,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 public partial class CardObject : Sprite2D
 {
+	private bool gameLoading = true;
 	private readonly Texture fullCardsImg = (Texture) GD.Load("res://fotos/Full_Deck.png");
 	private Vector2 orgFingerPos, orgCardPos, snapPos = new(0, 0), tempSnap = new (0, 0);
 	private CardObject bottomCard, topCard;
 	private CustomList currentList;
 	private Rect2 imgRegion;
-	private bool moving = false, movable = false, IsListDrawnDeck = false, snapLocked = false, FaceUp = true, oneClick = false;
+	private bool moving = false, movable = false, IsListDrawnDeck = false, snapLocked = false, FaceUp = true, oneClick = false, waitFlip = false;
 	private int suit, face;
 	float snapSpeed = 10f, timeElapsed = 0f;
 	private string listName = "";
@@ -27,7 +29,7 @@ public partial class CardObject : Sprite2D
 
 	// helps initalize object with correct name, face and texture
 	public CardObject Init(int suit, int face)
-    {
+	{
 		this.suit = suit;
 		this.face = face;
 		int offset = 2;
@@ -61,7 +63,7 @@ public partial class CardObject : Sprite2D
 
 	public void SetBottomCard(CardObject card)
 	{
-		bottomCard = card;
+		this.bottomCard = card;
 	}
 
 	public CardObject GetBottomCard()
@@ -72,6 +74,7 @@ public partial class CardObject : Sprite2D
 	public void SetTopCard(CardObject card)
 	{
 		topCard = card;
+		card?.SetBottomCard(this);
 	}
 
 	public CardObject GetTopCard()
@@ -91,12 +94,28 @@ public partial class CardObject : Sprite2D
 
 	public bool SnapLocked()
 	{
-		return snapLocked;
+		if (snapLocked)
+		{
+			return true;
+		}
+		else if (bottomCard != null)
+		{
+			return bottomCard.SnapLocked();
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	public bool IsFaceUp()
 	{
 		return FaceUp;
+	}
+
+	public void setGameLoaded()
+	{
+		gameLoading = false;
 	}
 
 	public bool IsOppositeSuit(CardObject card)
@@ -148,8 +167,13 @@ public partial class CardObject : Sprite2D
 		return false;
 	}
 
-	public void FlipCard()
+	public void FlipCard(bool waitOnFlip = false)
 	{
+		if (waitOnFlip && snapLocked)
+		{
+			waitFlip = waitOnFlip;
+			return;
+		}
 		if (FaceUp)
 		{
 			this.Texture = (Texture2D)Settings.cardTemplate;
@@ -166,7 +190,7 @@ public partial class CardObject : Sprite2D
 	public void BeginMove()
 	{
 		orgCardPos = Position;
-		bottomCard?.BeginMove();
+		this.bottomCard?.BeginMove();
 	}
 
 	public void Move(Vector2 fingerPos, Vector2 orgFingerPos)
@@ -188,7 +212,7 @@ public partial class CardObject : Sprite2D
 		bottomCard?.ReturnToOrigin();
 	}
 
-	public void ChangeList(CustomList newList, bool movable = true, bool fromDrawn = false)
+	public async void ChangeList(CustomList newList, bool movable = true, bool fromDrawn = false)
 	{
 		if (currentList != null)
 		{
@@ -197,6 +221,7 @@ public partial class CardObject : Sprite2D
 			{
 				if (!currentList.list[index -1].IsFaceUp())
 				{
+					//await Task.Delay(100);
 					currentList.list[index -1].FlipCard();
 					EmitSignal(SignalName.ScoreChange, 5);
 				}
@@ -241,6 +266,7 @@ public partial class CardObject : Sprite2D
 	public string SaveCardData()
 	{
 		Vector2 ToSave;
+		bool faceSave = FaceUp;
 		if (snapPos != new Vector2(0, 0))
 		{
 			ToSave = snapPos;
@@ -254,12 +280,17 @@ public partial class CardObject : Sprite2D
 			ToSave = Position;
 		}
 
+		if (waitFlip)
+		{
+			faceSave = !faceSave;
+		}
+
 		var data = new Dictionary
 		{
 			{"position", new Vector2(ToSave.X, ToSave. Y)},
 			{"bottomCard", bottomCard?.Name},
 			{"topCard", topCard?.Name},
-			{"IsFaceUp", FaceUp},
+			{"IsFaceUp", faceSave},
 			{"movable", movable},
 			{"listName", currentList.name}
 		};
@@ -328,10 +359,15 @@ public partial class CardObject : Sprite2D
 	// used to detect if card was actually touched 
 	// consumes event to prevent others from moving
 	public override void _Input(InputEvent @event)
-    {
+	{
+		if (gameLoading)
+		{
+			GetViewport().SetInputAsHandled();
+			return;
+		}
 		float cardWidth = 71 * Scale.X, cardHeight = 96 * Scale.Y;
 
-        if (@event is InputEventScreenTouch && @event.IsPressed()  && Finger_Index(@event) == 0)
+		if (@event is InputEventScreenTouch && @event.IsPressed()  && Finger_Index(@event) == 0)
 		{
 			Vector2 cardEnd = new(Position.X + cardWidth, Position.Y + cardHeight);
 			Vector2 fingerPos = Finger_Position(@event);
@@ -352,6 +388,7 @@ public partial class CardObject : Sprite2D
 				{
 					oneClick = false;
 					EmitSignal(SignalName.CardDoubleClicked, this);
+					GetViewport().SetInputAsHandled();
 				}
 			}
 		}
@@ -365,7 +402,7 @@ public partial class CardObject : Sprite2D
 			}
 		}
 		if (@event is InputEventScreenTouch && !@event.IsPressed()  && Finger_Index(@event) == 0)
-        {
+		{
 			if (moving)
 			{
 				moving = false;
@@ -373,7 +410,7 @@ public partial class CardObject : Sprite2D
 				EmitSignal(SignalName.CardMoved, this, orgCardPos);
 
 			}
-        }
+		}
 	}
 
 	// occurs when screen is redrawn
@@ -381,6 +418,7 @@ public partial class CardObject : Sprite2D
 	// also used to slowly move card towards its goal for more seamless moving
 	public override void _Process(double delta)
 	{
+
 		if (oneClick)
 		{
 			timeElapsed += (float) delta;
@@ -401,6 +439,11 @@ public partial class CardObject : Sprite2D
 				snapLocked = false;
 				snapPos = new(0, 0);
 				snapSpeed = 10f;
+				if (waitFlip)
+				{
+					FlipCard();
+					waitFlip = false;
+				}
 			}
 		}
 		if (tempSnap != new Vector2(0, 0))
@@ -413,6 +456,11 @@ public partial class CardObject : Sprite2D
 				tempSnap = new(0, 0);
 				snapSpeed = 10f;
 				Position = orgCardPos;
+				if (waitFlip)
+				{
+					FlipCard();
+					waitFlip = false;
+				}
 			}
 		}
 	}
@@ -420,34 +468,34 @@ public partial class CardObject : Sprite2D
 	// determines finger index
 	public static int Finger_Index(InputEvent @event)
   	{
-    	int fingerI = -1;
-    	if (@event is InputEventScreenDrag)
-    	{
-        	var finger = ((InputEventScreenDrag)@event);
-        	fingerI = finger.Index;
-    	}
-    	else
-    	{
-        	var finger = ((InputEventScreenTouch)@event);
-        	fingerI = finger.Index;
-    	}
-    	return fingerI;
+		int fingerI = -1;
+		if (@event is InputEventScreenDrag)
+		{
+			var finger = ((InputEventScreenDrag)@event);
+			fingerI = finger.Index;
+		}
+		else
+		{
+			var finger = ((InputEventScreenTouch)@event);
+			fingerI = finger.Index;
+		}
+		return fingerI;
   	}
 
 	// determines finger position
 	public static Vector2 Finger_Position(InputEvent @event)
   	{
-    	Vector2 fingerPos = Vector2.Zero;
-    	if (@event is InputEventScreenDrag)
-    	{
-        	var finger = ((InputEventScreenDrag)@event);
-        	fingerPos = finger.Position;
-    	}
-    	else
-    	{
-        	var finger = ((InputEventScreenTouch)@event);
-        	fingerPos = finger.Position;
-    	}
-    	return fingerPos;
+		Vector2 fingerPos = Vector2.Zero;
+		if (@event is InputEventScreenDrag)
+		{
+			var finger = ((InputEventScreenDrag)@event);
+			fingerPos = finger.Position;
+		}
+		else
+		{
+			var finger = ((InputEventScreenTouch)@event);
+			fingerPos = finger.Position;
+		}
+		return fingerPos;
   	}
 }
