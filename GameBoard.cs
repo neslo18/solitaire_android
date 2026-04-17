@@ -96,7 +96,8 @@ public partial class GameBoard : Node2D
 		}
 		else
 		{
-			Settings.cardTemplate = GD.Load<Texture2D>("res://fotos/Tardis.png");
+			GD.Print("def");
+			Settings.cardTemplate = ImageTexture.CreateFromImage(Settings.AddBackground(GD.Load<Texture2D>("res://fotos/default_face.png").GetImage()));
 		}
 
 		// applies new or old settings

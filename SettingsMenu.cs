@@ -108,14 +108,17 @@ public partial class SettingsMenu : Control
 
 	    if (err == Error.Ok)
 	    {
-	        img.Resize(71, 96);
+	        img.Resize(67, 92);
+			img = Settings.AddBackground(img);
 	        ImageTexture texture = ImageTexture.CreateFromImage(img);
 	        cardTemplate.Texture = texture;
 	    }
 	}
+
 	private void ResetTemplate()
 	{
-		Settings.cardTemplate = (Texture2D) GD.Load("res://fotos/Tardis.png");
+		Image resetImg = Settings.AddBackground(((Texture2D) GD.Load("res://fotos/default_face.png")).GetImage());
+		Settings.cardTemplate = ImageTexture.CreateFromImage(resetImg);
 		cardTemplate.Texture = Settings.cardTemplate;
 	}
 

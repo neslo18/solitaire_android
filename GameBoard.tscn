@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c4xdk7jaw40ne"]
 
 [ext_resource type="Script" uid="uid://hyv0oh67oa2a" path="res://GameBoard.cs" id="1_p1wqh"]
-[ext_resource type="Texture2D" uid="uid://dvnij1v2ud0q7" path="res://fotos/Tardis.png" id="2_trxdi"]
+[ext_resource type="Texture2D" uid="uid://bksa24cwg0ekl" path="res://fotos/default_face.png" id="2_p1wqh"]
 [ext_resource type="Texture2D" uid="uid://c8186kaiye2qi" path="res://fotos/Card_Slot.png" id="3_6xh2g"]
 [ext_resource type="PackedScene" uid="uid://bni86f76fefn0" path="res://subMenu.tscn" id="4_atwlb"]
 [ext_resource type="PackedScene" uid="uid://qyinwiisv0s5" path="res://fireworks.tscn" id="5_fabdd"]
@@ -76,7 +76,7 @@ offset_left = 610.0
 offset_top = 140.0
 offset_right = 698.75
 offset_bottom = 260.0
-texture_normal = ExtResource("2_trxdi")
+texture_normal = ExtResource("2_p1wqh")
 stretch_mode = 5
 
 [node name="foundationContainer" type="HBoxContainer" parent="." unique_id=25826751]
