@@ -322,6 +322,10 @@ public partial class GameBoard : Node2D
 		else
 		{
 			UpdateMoves();
+			if (CheckWon())
+			{
+				ShowFireworks();
+			}
 		}
 	}
 
