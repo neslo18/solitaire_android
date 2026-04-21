@@ -6,8 +6,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "/home/deck/Apps/Godot/Godot_v4.6.2/Godot_v4.6.2.x86_64",
-            "args": [
+            "program": "/home/neslo18/Apps/Godot_v4.6.2/Godot_v4.6.2.x86_64",
+            "args": 
+            [
                 "--path",
                 "${workspaceRoot}"
             ],

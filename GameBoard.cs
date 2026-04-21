@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 public partial class GameBoard : Node2D
 {
@@ -22,6 +23,7 @@ public partial class GameBoard : Node2D
 	private readonly TextureRect[] tableauSlots = new TextureRect[7];
 	private readonly TextureRect[] foundationSlots = new TextureRect[4];
 	private TextureButton deckSlot;
+	private Button AutocompleteButton;
 	private bool pauseTree = true;
 
 	// occurs when screen redraws
@@ -214,6 +216,8 @@ public partial class GameBoard : Node2D
 			card.setGameLoaded();
 		}
 		gameLoading = false;
+		AutocompleteButton = GetNode<Button>("AutocompleteButton");
+		AutocompleteButton.Pressed += AutoComplete;
 	}
 
 	// determines if won
@@ -639,6 +643,32 @@ public partial class GameBoard : Node2D
 		return snapped;
 	}
 
+	// Checks if autocomplete can be triggered
+	private void AutoComplete()
+	{
+
+		String cardSuit;
+		for (int i =0; i < 4; i++)
+		{
+			if (foundations[i].list.Count > 0 && foundations[i].list.Count < 13)
+			{
+				cardSuit = foundations[i].list[^1].Name.ToString().Substr(0,1);
+				foreach (CardObject card in everyCard.FindAll(c => c.Name.ToString().Substr(0,1) == cardSuit))
+				{
+					if (!foundations[i].list.Contains(card))
+					{
+						card.SnapNewPos(foundationSlots[i].GlobalPosition);
+						card.GetTopCard()?.SetBottomCard(null);
+						card.SetTopCard(null);
+						card.ChangeList(foundations[i]);
+						card.MoveToFront();
+					}
+				}
+			} 	
+		}
+		ShowFireworks();	
+	}
+
 	// triggered when a successful move is complete. adds move counter and triggers save of current state.
 	private void UpdateMoves()
 	{
@@ -658,8 +688,27 @@ public partial class GameBoard : Node2D
 
 		Label scoreLabel = GetNode<Label>("./scoreContainer/scoreValue");
 		scoreMoves.Add(int.Parse(scoreLabel.Text));
-	}
 
+		int movableCount = 0;
+
+		foreach (CardObject card in everyCard)
+		{
+			if (card.IsMovable())
+			{
+				movableCount++;
+			}
+		}
+
+
+		if (movableCount == 52)
+		{
+			AutocompleteButton.Visible = true;
+		}
+		else
+		{
+			AutocompleteButton.Visible = false;
+		}
+	}
 	// triggers when score needs updating
 	private void UpdateScore(int score)
 	{
@@ -899,6 +948,27 @@ public partial class GameBoard : Node2D
 			Moves.RemoveAt(Moves.Count - 1);
 			TableMove.RemoveAt(TableMove.Count - 1);
 			scoreMoves.RemoveAt(scoreMoves.Count - 1);
+
+			int movableCount = 0;
+
+			foreach (CardObject card in everyCard)
+			{
+				if (card.IsMovable())
+				{
+					movableCount++;
+				}
+			}
+
+
+			if (movableCount == 52)
+			{
+				AutocompleteButton.Visible = true;
+			}
+			else
+			{
+				AutocompleteButton.Visible = false;
+			}
+		
 		}
 	}
 
